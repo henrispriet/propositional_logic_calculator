@@ -14,7 +14,7 @@ fn test_parse_and_expression() {
     let mut parser = Parser::new("A&B");
     assert_eq!(
         parser.parse().unwrap(),
-        *var("A").and(&var("B"))
+        *var("A").and(var("B"))
     );
 }
 
@@ -23,12 +23,12 @@ fn test_parse_or_expression() {
     let mut parser = Parser::new("A|B");
     assert_eq!(
         parser.parse().unwrap(),
-        *var("A").or(&var("B"))
+        *var("A").or(var("B"))
     );
     let mut parser = Parser::new("AvB");
     assert_eq!(
         parser.parse().unwrap(),
-        *var("A").or(&var("B"))
+        *var("A").or(var("B"))
     );
 }
 
@@ -37,7 +37,7 @@ fn test_parse_not_expression() {
     let mut parser = Parser::new("-A");
     assert_eq!(
         parser.parse().unwrap(),
-        *not(&var("A"))
+        *not(var("A"))
     );
 }
 
@@ -46,7 +46,7 @@ fn test_parse_nested_expression() {
     let mut parser = Parser::new("-(A&B)");
     assert_eq!(
         parser.parse().unwrap(),
-        *not(&var("A").and(&var("B")))
+        *not(var("A").and(var("B")))
     );
 }
 
@@ -67,7 +67,7 @@ fn test_ingore_invalid_characters() {
     let mut parser = Parser::new("A & B");
     assert_eq!(
         parser.parse().unwrap(),
-        *var("A").and(&var("B"))
+        *var("A").and(var("B"))
     );
 }
 
@@ -76,7 +76,7 @@ fn test_ignore_invalid_character_in_brackets() {
     let mut parser = Parser::new("(A & B)");
     assert_eq!(
         parser.parse().unwrap(),
-        *var("A").and(&var("B"))
+        *var("A").and(var("B"))
     );
 }
 
@@ -85,7 +85,7 @@ fn test_deeply_nested_expression() {
     let mut parser = Parser::new("(((((A))))&B)");
     assert_eq!(
         parser.parse().unwrap(),
-        *var("A").and(&var("B"))
+        *var("A").and(var("B"))
     );
 }
 

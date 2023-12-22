@@ -39,7 +39,7 @@ impl Display for Expression {
 /// ```
 /// # use propositional_logic_calculator::{declare, expression::not};
 /// declare!(a, b);
-/// (a.or(&not(&b))).implies(&b);
+/// (a.or(not(b.clone()))).implies(b);
 /// ```
 #[macro_export]
 macro_rules! declare {
@@ -57,8 +57,8 @@ pub fn var(name: impl Into<String>) -> Rc<Expression> {
 }
 
 /// shorthand for negation
-pub fn not(expr: &Rc<Expression>) -> Rc<Expression> {
-    Rc::new(Expression::Not(Rc::clone(expr)))
+pub fn not(expr: Rc<Expression>) -> Rc<Expression> {
+    Rc::new(Expression::Not(expr))
 }
 
 impl Expression {
@@ -109,17 +109,17 @@ impl Expression {
     }
 
     /// shorthand for and exression
-    pub fn and(self: &Rc<Self>, other: &Rc<Self>) -> Rc<Self> {
-        Rc::new(Self::And(Rc::clone(self), Rc::clone(other)))
+    pub fn and(self: Rc<Self>, other: Rc<Self>) -> Rc<Self> {
+        Rc::new(Self::And(self, other))
     }
 
     /// shorthand for or exression
-    pub fn or(self: &Rc<Self>, other: &Rc<Self>) -> Rc<Self> {
-        Rc::new(Self::Or(Rc::clone(self), Rc::clone(other)))
+    pub fn or(self: Rc<Self>, other: Rc<Self>) -> Rc<Self> {
+        Rc::new(Self::Or(self, other))
     }
 
     /// shorthand for implies expression
-    pub fn implies(self: &Rc<Self>, other: &Rc<Self>) -> Rc<Self> {
-        Rc::new(Self::Implies(Rc::clone(self), Rc::clone(other)))
+    pub fn implies(self: Rc<Self>, other: Rc<Self>) -> Rc<Self> {
+        Rc::new(Self::Implies(self, other))
     }
 }
