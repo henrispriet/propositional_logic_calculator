@@ -35,8 +35,33 @@ impl Display for Expression {
     }
 }
 
-impl Expression {
+/// shorthand for declaring a bunch of variables upfront
+/// ```
+/// # use propositional_logic_calculator::{declare, expression::not};
+/// declare!(a, b);
+/// (a.or(&not(&b))).implies(&b);
+/// ```
+#[macro_export]
+macro_rules! declare {
+    ($($var: ident),+) => {
+        $(
+            let $var = $crate::expression::var(stringify!($var));
+        )*
+    }
+}
 
+/// shorthand for a variable
+/// var("A")
+pub fn var(name: impl Into<String>) -> Rc<Expression> {
+    Rc::new(Expression::Var(name.into()))
+}
+
+/// shorthand for negation
+pub fn not(expr: &Rc<Expression>) -> Rc<Expression> {
+    Rc::new(Expression::Not(Rc::clone(expr)))
+}
+
+impl Expression {
     /// Adds an Rc wrapper to the current `Expression` node.
     pub fn wrap(self) -> Rc<Expression> {
         Rc::new(self)
@@ -46,20 +71,20 @@ impl Expression {
     /// It traverses the AST recursively to gather all expressions.
     ///
     /// Returns a `Vec<Expression>` containing all unique expressions found.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use propositional_logic_calculator::expression::Expression;
     /// use std::rc::Rc;
-    /// 
+    ///
     /// let expr = Expression::And(Expression::Var("A".to_string()).wrap(),
     ///     Expression::Or(
     ///         Expression::Var("B".to_string()).wrap(),
     ///         Expression::Var("C".to_string()).wrap(),
     ///     ).wrap(),
     /// );
-    /// 
+    ///
     /// let expressions = expr.list_expressions();
     /// assert_eq!(expressions.len(), 5);
     /// ```
@@ -81,5 +106,20 @@ impl Expression {
         }
         expressions.dedup();
         expressions
+    }
+
+    /// shorthand for and exression
+    pub fn and(self: &Rc<Self>, other: &Rc<Self>) -> Rc<Self> {
+        Rc::new(Self::And(Rc::clone(self), Rc::clone(other)))
+    }
+
+    /// shorthand for or exression
+    pub fn or(self: &Rc<Self>, other: &Rc<Self>) -> Rc<Self> {
+        Rc::new(Self::Or(Rc::clone(self), Rc::clone(other)))
+    }
+
+    /// shorthand for implies expression
+    pub fn implies(self: &Rc<Self>, other: &Rc<Self>) -> Rc<Self> {
+        Rc::new(Self::Implies(Rc::clone(self), Rc::clone(other)))
     }
 }

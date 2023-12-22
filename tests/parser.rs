@@ -1,4 +1,7 @@
-use propositional_logic_calculator::{expression::Expression, parser::Parser};
+use propositional_logic_calculator::{
+    expression::{not, var, Expression},
+    parser::Parser,
+};
 
 #[test]
 fn test_parse_simple_expression() {
@@ -11,10 +14,7 @@ fn test_parse_and_expression() {
     let mut parser = Parser::new("A&B");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::And(
-            Expression::Var("A".to_string()).wrap(),
-            Expression::Var("B".to_string()).wrap(),
-        )
+        *var("A").and(&var("B"))
     );
 }
 
@@ -23,18 +23,12 @@ fn test_parse_or_expression() {
     let mut parser = Parser::new("A|B");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::Or(
-            Expression::Var("A".to_string()).wrap(),
-            Expression::Var("B".to_string()).wrap(),
-        )
+        *var("A").or(&var("B"))
     );
     let mut parser = Parser::new("AvB");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::Or(
-            Expression::Var("A".to_string()).wrap(),
-            Expression::Var("B".to_string()).wrap(),
-        )
+        *var("A").or(&var("B"))
     );
 }
 
@@ -43,7 +37,7 @@ fn test_parse_not_expression() {
     let mut parser = Parser::new("-A");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::Not(Expression::Var("A".to_string()).wrap())
+        *not(&var("A"))
     );
 }
 
@@ -52,13 +46,7 @@ fn test_parse_nested_expression() {
     let mut parser = Parser::new("-(A&B)");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::Not(
-            Expression::And(
-                Expression::Var("A".to_string()).wrap(),
-                Expression::Var("B".to_string()).wrap()
-            )
-            .wrap()
-        )
+        *not(&var("A").and(&var("B")))
     );
 }
 
@@ -79,10 +67,7 @@ fn test_ingore_invalid_characters() {
     let mut parser = Parser::new("A & B");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::And(
-            Expression::Var("A".to_string()).wrap(),
-            Expression::Var("B".to_string()).wrap(),
-        )
+        *var("A").and(&var("B"))
     );
 }
 
@@ -91,10 +76,7 @@ fn test_ignore_invalid_character_in_brackets() {
     let mut parser = Parser::new("(A & B)");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::And(
-            Expression::Var("A".to_string()).wrap(),
-            Expression::Var("B".to_string()).wrap(),
-        )
+        *var("A").and(&var("B"))
     );
 }
 
@@ -103,10 +85,7 @@ fn test_deeply_nested_expression() {
     let mut parser = Parser::new("(((((A))))&B)");
     assert_eq!(
         parser.parse().unwrap(),
-        Expression::And(
-            Expression::Var("A".to_string()).wrap(),
-            Expression::Var("B".to_string()).wrap(),
-        )
+        *var("A").and(&var("B"))
     );
 }
 
